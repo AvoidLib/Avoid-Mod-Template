@@ -1,0 +1,66 @@
+import groovy.json.JsonSlurper
+
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+
+var libs = project.file("libs").toPath()
+
+Path avoid        = project.file("libs/Avoid-${properties.avoid_version}.jar").toPath()
+Path avoidSources = project.file("libs/Avoid-${properties.avoid_version}-sources.jar").toPath()
+
+ext.libs = libs
+
+ext.avoid        = avoid
+ext.avoidSources = avoidSources
+
+@SuppressWarnings('GrMethodMayBeStatic')
+void downloadAvoid_fun() {
+    Files.createDirectories(libs)
+
+    var client = HttpClient.newHttpClient()
+    var resp = client.send(HttpRequest.newBuilder()
+                                         .uri(URI.create('https://api.github.com/repos/AvoidLib/Avoid/releases' + (properties.avoid_version == "latest" ? "/latest" : "")))
+                                         .method("GET", HttpRequest.BodyPublishers.noBody())
+                                         .header("Accept", "application/vnd.github+json")
+                                         .header("X-GitHub-Api-Version", "2026-03-10")
+                                         .build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+
+    if (resp.statusCode() >= 400)
+        throw new RuntimeException("Failed to fetch Avoid versions (status code ${resp.statusCode()})")
+
+    var versions = new JsonSlurper().parseText(resp.body())
+    var version
+
+    if (properties.avoid_version != "latest") {
+        for (var ver : versions)
+            if (ver['tag_name'] == "v" + properties.avoid_version)
+                version = ver;
+
+        if (version == null)
+            throw new RuntimeException("Missing Avoid version '%s'".formatted(properties.avoid_version));
+    } else {
+        version = versions
+    }
+
+    URI.create(version['assets'][1]['browser_download_url'] as String) \
+       .toURL() \
+       .withInputStream{ i -> avoid.withOutputStream{ it << i }}
+
+    URI.create(version['assets'][0]['browser_download_url'] as String) \
+       .toURL() \
+       .withInputStream{ i -> avoidSources.withOutputStream{ it << i }}
+}
+
+tasks.register("downloadAvoid") {
+    doFirst {
+        downloadAvoid_fun()
+    }
+}
+
+if (!Files.isRegularFile(avoid) || !Files.isRegularFile(avoidSources)) {
+    downloadAvoid_fun()
+}
