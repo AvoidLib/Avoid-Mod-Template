@@ -63,7 +63,7 @@ private String output(String... command) {
 
     proc.waitFor()
 
-    return new String(proc.in.readAllBytes(), StandardCharsets.UTF_8).substring(0, 40)
+    return new String(proc.in.readAllBytes(), StandardCharsets.UTF_8)
 }
 
 private String getBranch()            { return output("git", "branch", "--no-color", "--no-abbrev", "--show-current") }
