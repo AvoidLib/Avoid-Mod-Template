@@ -85,6 +85,22 @@ processResources {
     }
 }
 
+//====================//
+//=== Output Setup ===//
+//====================//
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.properties.jarName}" }
+    }
+
+    if (project.file('src/main/resources/META-INF/MANIFEST.MF').isFile()) {
+        manifest {
+            from 'src/main/resources/META-INF/MANIFEST.MF'
+        }
+    }
+}
+
 //========================================//
 //===       Rename to .avoid.zip       ===//
 //===  (silences modloaders warnings)  ===//
