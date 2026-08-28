@@ -3,6 +3,21 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
+buildscript {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath 'net.fabricmc:fabric-loom:1.17-SNAPSHOT'
+    }
+}
+
 plugins {
     id 'java'
     id 'idea'
@@ -27,8 +42,13 @@ repositories {
 //=== Local Plugins ===//
 //=====================//
 
-apply from: rootProject.file("build_avoid.gradle")
-apply from: rootProject.file("build_launchers.gradle")
+apply from: rootProject.file("x_build/jar_pre.gradle")
+
+evaluate(rootProject.file("x_build/fabric.gradle"))(project)
+
+apply from: rootProject.file("x_build/jar.gradle")
+apply from: rootProject.file("x_build/avoid.gradle")
+apply from: rootProject.file("x_build/launchers.gradle")
 
 //============//
 //=== Base ===//
@@ -47,7 +67,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation "pl.olafcio:avoid:${project.properties.avoid_version}"
+    modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
 
     compileOnly "org.joml:joml:1.10.8"
     compileOnly "org.jetbrains:annotations:20.1.0"
@@ -74,7 +94,9 @@ private String getCommitAmountTotal() { return output("git", "rev-list", "--coun
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
-    inputs.properties.putAll(project.properties)
+    for (var entry : project.properties)
+        if (entry.getValue() instanceof String)
+            inputs.property entry.getKey(), entry.getValue()
 
     inputs.property "branch", getBranch()
     inputs.property "commit_hash", getCommitHash()
@@ -109,20 +131,14 @@ jar {
 //========================================//
 
 private Path getOldJAR() {
-    return tasks.jar.archiveFile.get().asFile.toPath()
+    return ext.effectiveJar.archiveFile.get().asFile.toPath()
 }
 
-private Path getAvoidZIP() {
-    var path = getOldJAR()
-    var str = path.toString().split("/").last()
+project.ext.getOldJar = { -> getOldJar() }
 
-    return path.getParent().resolve(str.substring(0, str.length() - 4) + ".avoid.zip")
-}
-
-ext.buildFile = getAvoidZIP()
-
-tasks.jar.doLast {
-    Files.move(getOldJAR(), getAvoidZIP(), StandardCopyOption.REPLACE_EXISTING)
+tasks.build.doLast {
+    if (Files.isRegularFile(getOldJAR()))
+        Files.move(getOldJAR(), project.ext.buildFile, StandardCopyOption.REPLACE_EXISTING)
 }
 
 //============//
