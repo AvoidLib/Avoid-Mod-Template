@@ -1,5 +1,6 @@
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 plugins {
@@ -27,6 +28,7 @@ repositories {
 //=====================//
 
 apply from: rootProject.file("build_avoid.gradle")
+apply from: rootProject.file("build_launchers.gradle")
 
 //============//
 //=== Base ===//
@@ -106,11 +108,21 @@ jar {
 //===  (silences modloaders warnings)  ===//
 //========================================//
 
-tasks.jar.doLast {
-    var path = tasks.jar.archiveFile.get().asFile.toPath()
+private Path getOldJAR() {
+    return tasks.jar.archiveFile.get().asFile.toPath()
+}
+
+private Path getAvoidZIP() {
+    var path = getOldJAR()
     var str = path.toString().split("/").last()
 
-    Files.move(path, path.getParent().resolve(str.substring(0, str.length() - 4) + ".avoid.zip"), StandardCopyOption.REPLACE_EXISTING)
+    return path.getParent().resolve(str.substring(0, str.length() - 4) + ".avoid.zip")
+}
+
+ext.buildFile = getAvoidZIP()
+
+tasks.jar.doLast {
+    Files.move(getOldJAR(), getAvoidZIP(), StandardCopyOption.REPLACE_EXISTING)
 }
 
 //============//
