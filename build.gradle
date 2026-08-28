@@ -51,6 +51,10 @@ dependencies {
     compileOnly "org.jetbrains:annotations:20.1.0"
 }
 
+//=================//
+//=== Resources ===//
+//=================//
+
 private String output(String... command) {
     var proc = new ProcessBuilder().command(command)
                                             .start()
@@ -64,10 +68,6 @@ private String getBranch()            { return output("git", "branch", "--no-col
 private String getCommitHash()        { return output("git", "log", getBranch(), "-1", "--format=%H")                 }
 private String getCommitAmount()      { return output("git", "rev-list", "--count", getBranch())                      }
 private String getCommitAmountTotal() { return output("git", "rev-list", "--count", "--all")                          }
-
-//=================//
-//=== Resources ===//
-//=================//
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
