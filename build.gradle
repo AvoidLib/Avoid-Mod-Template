@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
@@ -34,10 +35,29 @@ dependencies {
     compileOnly "org.jetbrains:annotations:20.1.0"
 }
 
+private String output(String... command) {
+    var proc = new ProcessBuilder().command(command)
+                                            .start()
+
+    proc.waitFor()
+
+    return new String(proc.in.readAllBytes(), StandardCharsets.UTF_8).substring(0, 40)
+}
+
+private String getBranch()            { return output("git", "branch", "--no-color", "--no-abbrev", "--show-current") }
+private String getCommitHash()        { return output("git", "log", getBranch(), "-1", "--format=%H")                 }
+private String getCommitAmount()      { return output("git", "rev-list", "--count", getBranch())                      }
+private String getCommitAmountTotal() { return output("git", "rev-list", "--count", "--all")                          }
+
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
-    inputs.property "version", project.version
+    inputs.properties.putAll(project.properties)
+
+    inputs.property "branch", getBranch()
+    inputs.property "commit_hash", getCommitHash()
+    inputs.property "commit_amount", getCommitAmount()
+    inputs.property "commit_amount_total", getCommitAmountTotal()
 
     filteringCharset "UTF-8"
     filesMatching(["avoid.mod.json"]) {
