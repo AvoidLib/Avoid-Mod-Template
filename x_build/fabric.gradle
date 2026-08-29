@@ -25,7 +25,7 @@ return { Object project ->
 
         final var mod = obj -> has_mappings ? modImplementation(obj) : implementation(obj)
 
-        mod "net.fabricmc:fabric-loader:0.19.1"
+        mod "net.fabricmc:fabric-loader:0.19.3"
     }
 
     if (project.ext.has("buildFile"))
