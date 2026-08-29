@@ -42,6 +42,9 @@ void downloadAvoidRuntime_fun() {
                 break
 
             version = modrinth_fetchVersion(client, "avoid", ver)
+
+            if (version['version_number'] != properties.avoid_version)
+                break
         } else {
             ok = true;
             break;
