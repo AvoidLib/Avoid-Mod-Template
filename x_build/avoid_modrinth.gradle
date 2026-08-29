@@ -62,6 +62,6 @@ tasks.register("downloadAvoidRuntime") {
     }
 }
 
-if (project.properties.minecraft != "1.21.11" && !Files.isRegularFile(avoidRuntime)) {
+if (project.properties.minecraft != nativeAvoidMinecraft() && !Files.isRegularFile(avoidRuntime)) {
     downloadAvoidRuntime_fun()
 }

@@ -68,7 +68,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    if (project.properties.minecraft != "1.21.11") {
+    if (project.properties.minecraft != nativeAvoidMinecraft()) {
         modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}+${project.properties.minecraft}"
         compileOnly "pl.olafcio:avoid:${project.properties.avoid_version}"
     } else {

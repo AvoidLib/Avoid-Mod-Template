@@ -64,3 +64,16 @@ tasks.register("downloadAvoid") {
 if (!Files.isRegularFile(avoid) || !Files.isRegularFile(avoidSources)) {
     downloadAvoid_fun()
 }
+
+apply from: rootProject.file("x_build/mod_info.gradle")
+
+/**
+ * Returns the Minecraft version that the Avoid JAR hosted on GitHub is made for.
+ */
+String nativeAvoidMinecraft() {
+    return readFMJ(avoid)['depends']['minecraft']
+}
+
+ext {
+    nativeAvoidMinecraft = this.&nativeAvoidMinecraft
+}
