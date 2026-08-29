@@ -28,6 +28,8 @@ return { Object project ->
         mod "net.fabricmc:fabric-loader:0.19.3"
     }
 
+    project.tasks.runClient.dependsOn project.tasks.build
+
     if (project.ext.has("buildFile"))
         try             { Files.createSymbolicLink(project.file("run/mods/" + project.ext.buildFile.getFileName().toString() + ".jar").toPath(), project.ext.buildFile) }
         catch (ignored) {}
