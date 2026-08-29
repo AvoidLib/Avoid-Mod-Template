@@ -48,6 +48,7 @@ evaluate(rootProject.file("x_build/fabric.gradle"))(project)
 
 apply from: rootProject.file("x_build/jar.gradle")
 apply from: rootProject.file("x_build/avoid.gradle")
+apply from: rootProject.file("x_build/avoid_modrinth.gradle")
 apply from: rootProject.file("x_build/launchers.gradle")
 
 //============//
@@ -67,7 +68,12 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
+    if (project.properties.minecraft != "1.21.11") {
+        modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}+${project.properties.minecraft}"
+        compileOnly "pl.olafcio:avoid:${project.properties.avoid_version}"
+    } else {
+        modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
+    }
 
     compileOnly "org.joml:joml:1.10.8"
     compileOnly "org.jetbrains:annotations:20.1.0"
