@@ -72,7 +72,7 @@ dependencies {
 
     if (project.properties.minecraft != nativeAvoidMinecraft()) {
         modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}+${project.properties.minecraft}"
-        compileOnly "pl.olafcio:avoid:${project.properties.avoid_version}"
+        compileOnly       "pl.olafcio:avoid:${project.properties.avoid_version}"
     } else {
         modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
     }
