@@ -49,7 +49,9 @@ evaluate(rootProject.file("x_build/fabric.gradle"))(project)
 apply from: rootProject.file("x_build/jar.gradle")
 apply from: rootProject.file("x_build/avoid.gradle")
 apply from: rootProject.file("x_build/avoid_modrinth.gradle")
+apply from: rootProject.file("x_build/mod_info.gradle")
 apply from: rootProject.file("x_build/launchers.gradle")
+apply from: rootProject.file("x_build/depend/github_depend.gradle")
 
 //============//
 //=== Base ===//
@@ -73,6 +75,10 @@ dependencies {
         compileOnly "pl.olafcio:avoid:${project.properties.avoid_version}"
     } else {
         modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
+    }
+
+    if ('backported' in readFMJ(avoidRuntime)['depends']) {
+        modRuntimeOnly github("AvoidLib/Backported", jarFinder: { fn -> fn.contains("+" + project.properties.minecraft) })
     }
 
     compileOnly "org.joml:joml:1.10.8"

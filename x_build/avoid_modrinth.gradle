@@ -9,7 +9,7 @@ Path avoid = project.file("libs/Avoid-${properties.avoid_version}+${properties.m
 ext.libs         = libs
 ext.avoidRuntime = avoid
 
-apply from: project.file("x_build/modrinth_api.gradle")
+apply from: project.file("x_build/api/modrinth_api.gradle")
 
 @SuppressWarnings('GrMethodMayBeStatic')
 void downloadAvoidRuntime_fun() {
