@@ -65,6 +65,9 @@ tasks.register("downloadAvoidRuntime") {
     }
 }
 
-if (project.properties.minecraft != nativeAvoidMinecraft() && !Files.isRegularFile(avoidRuntime)) {
-    downloadAvoidRuntime_fun()
+if (project.properties.minecraft != nativeAvoidMinecraft()) {
+    if (!Files.isRegularFile(avoidRuntime))
+        downloadAvoidRuntime_fun()
+} else {
+    ext.avoidRuntime = ext.avoid
 }
