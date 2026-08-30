@@ -4,10 +4,16 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 buildscript {
+    apply from: rootProject.file("x_build/depend/github_depend.gradle")
+
     repositories {
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
+        }
+
+        flatDir {
+            dirs "libs"
         }
 
         gradlePluginPortal()
@@ -15,6 +21,7 @@ buildscript {
 
     dependencies {
         classpath 'net.fabricmc:fabric-loom:1.17-SNAPSHOT'
+        classpath github("Olafcio1/LimePublishing")
     }
 }
 
@@ -22,6 +29,8 @@ plugins {
     id 'java'
     id 'idea'
 }
+
+apply plugin: 'lime-publishing'
 
 group = 'com.example.avoidmod'
 version = project.properties.version
@@ -185,4 +194,61 @@ java {
 
 test {
     useJUnitPlatform()
+}
+
+//==================//
+//=== Publishing ===//
+//==================//
+final def changelogFile = rootProject.file("CHANGELOG").toPath()
+
+import pl.olafcio.limepublish.enums.Environment
+import pl.olafcio.limepublish.enums.VersionType
+import pl.olafcio.limepublish.enums.extra.extended_platform.ExtendedPlatform
+
+release {
+    name           "${rootProject.name.replace("-", " ").replace("_", " ")} v${project.properties.version}"
+    version_number project.properties.version
+    version_type   VersionType.STABLE
+    environment    Environment.CLIENT_OR_SERVER_PREFERS_BOTH
+    platforms =    [ExtendedPlatform.AVOID]
+    minecraft =    ["1.21.8", "1.21.10", "1.21.11", "26.1", "26.1.1", "26.1.2", "26.2", "26.3-snapshot-10"]
+    changelog      Files.isRegularFile(changelogFile) ? Files.readString(changelogFile, StandardCharsets.UTF_8) : ""
+
+    files {
+        main project.ext.buildFile
+    }
+
+    requires {
+        project "avoid"
+    }
+
+    modrinth {
+        slug  "example-mod"
+        token providers.environmentVariable("MODRINTH_API_KEY")
+    }
+
+    ////////////////////////////////
+    /// USED CHANGELOG DETECTION ///
+    ////////////////////////////////
+
+    tasks.release {
+        doFirst {
+            var changelog2 = changelog.trim()
+
+            if (changelog2.startsWith("### This changelog was used. To allow next usage, remove this comment. ###\n")) {
+                println "\n\n[ Release ]\nIt looks like you forgot to update the changelog!\nPlease update it before releasing.\n\n"
+                System.exit(1)
+            } else if (changelog2.isEmpty()) {
+                println "\n\n[ Release ]\nAn empty changelog was provided!\nPlease update it before releasing.\n\n"
+                System.exit(1)
+            }
+        }
+
+        doLast {
+            var path = changelogFile
+
+            if (Files.isRegularFile(path))
+                Files.writeString(path, "### This changelog was used. To allow next usage, remove this comment. ###\n" + Files.readString(path, StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+        }
+    }
 }
