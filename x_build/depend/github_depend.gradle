@@ -2,9 +2,8 @@ import java.util.function.Predicate
 
 apply from: rootProject.file("x_build/api/github_api.gradle")
 
-libs = project.file("libs").toPath()
-
 String github(String repository, String versionName = "latest", Predicate<String> jarFinder = { _ -> true }, Predicate<String> sourcesJarFinder = { _ -> false }) {
+    var libs = project.file("libs").toPath()
     var version = github_getRelease(repository, versionName)
 
     def repoName = repository.substring(repository.indexOf("/") + 1)
