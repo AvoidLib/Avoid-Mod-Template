@@ -35,8 +35,16 @@ tasks.register("downloadAvoid") {
     }
 }
 
-if (!Files.isRegularFile(avoid) || !Files.isRegularFile(avoidSources)) {
+if (!Files.isRegularFile(avoid)) {
     downloadAvoid_fun()
+}
+
+if (!Files.isRegularFile(avoidSources)) {
+    try {
+        downloadAvoid_fun()
+    } catch (ignored) {
+        println "[!] Unable to download Avoid sources"
+    }
 }
 
 /**
