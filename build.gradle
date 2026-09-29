@@ -52,6 +52,7 @@ apply from: rootProject.file("x_build/avoid_modrinth.gradle")
 apply from: rootProject.file("x_build/mod_info.gradle")
 apply from: rootProject.file("x_build/launchers.gradle")
 apply from: rootProject.file("x_build/depend/github_depend.gradle")
+apply from: rootProject.file("x_build/avoid_plus.gradle")
 
 //============//
 //=== Base ===//
@@ -177,6 +178,17 @@ java {
 
     if (System.getProperty("gen_sources") != null)
         withSourcesJar()
+}
+
+//=======================//
+//=== Anti-mod repost ===//
+//=======================//
+
+avoid {
+    // makes your mod pass a signature verification test on each load.
+    // this makes your mod immune to mod reposting sites.
+
+    signatures = true
 }
 
 //=============//

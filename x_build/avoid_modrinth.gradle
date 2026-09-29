@@ -69,5 +69,5 @@ if (project.properties.minecraft != nativeAvoidMinecraft()) {
     if (!Files.isRegularFile(avoidRuntime))
         downloadAvoidRuntime_fun()
 } else {
-    ext.avoidRuntime = ext.avoid
+    ext.avoidRuntime = ext.avoidJAR
 }

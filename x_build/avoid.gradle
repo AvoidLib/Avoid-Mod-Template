@@ -6,13 +6,13 @@ apply from: rootProject.file("x_build/mod_info.gradle")
 
 var libs = project.file("libs").toPath()
 
-Path avoid        = project.file("libs/Avoid-${properties.avoid_version}.jar").toPath()
-Path avoidSources = project.file("libs/Avoid-${properties.avoid_version}-sources.jar").toPath()
+Path avoidJAR        = project.file("libs/Avoid-${properties.avoid_version}.jar").toPath()
+Path avoidJARSources = project.file("libs/Avoid-${properties.avoid_version}-sources.jar").toPath()
 
 ext.libs = libs
 
-ext.avoid        = avoid
-ext.avoidSources = avoidSources
+ext.avoidJAR        = avoidJAR
+ext.avoidJARSources = avoidJARSources
 
 @SuppressWarnings('GrMethodMayBeStatic')
 void downloadAvoid_fun() {
@@ -22,11 +22,11 @@ void downloadAvoid_fun() {
 
     URI.create(version['assets'][1]['browser_download_url'] as String) \
        .toURL() \
-       .withInputStream{ i -> avoid.withOutputStream{ it << i }}
+       .withInputStream{ i -> avoidJAR.withOutputStream{ it << i }}
 
     URI.create(version['assets'][0]['browser_download_url'] as String) \
        .toURL() \
-       .withInputStream{ i -> avoidSources.withOutputStream{ it << i }}
+       .withInputStream{ i -> avoidJARSources.withOutputStream{ it << i }}
 }
 
 tasks.register("downloadAvoid") {
@@ -35,11 +35,11 @@ tasks.register("downloadAvoid") {
     }
 }
 
-if (!Files.isRegularFile(avoid)) {
+if (!Files.isRegularFile(avoidJAR)) {
     downloadAvoid_fun()
 }
 
-if (!Files.isRegularFile(avoidSources)) {
+if (!Files.isRegularFile(avoidJARSources)) {
     try {
         downloadAvoid_fun()
     } catch (ignored) {
@@ -51,7 +51,7 @@ if (!Files.isRegularFile(avoidSources)) {
  * Returns the Minecraft version that the Avoid JAR hosted on GitHub is made for.
  */
 String nativeAvoidMinecraft() {
-    return readFMJ(avoid)['depends']['minecraft']
+    return readFMJ(avoidJAR)['depends']['minecraft']
 }
 
 ext {
