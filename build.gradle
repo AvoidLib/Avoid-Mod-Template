@@ -49,6 +49,7 @@ evaluate(rootProject.file("x_build/fabric.gradle"))(project)
 apply from: rootProject.file("x_build/jar.gradle")
 apply from: rootProject.file("x_build/avoid.gradle")
 apply from: rootProject.file("x_build/avoid_modrinth.gradle")
+apply from: rootProject.file("x_build/avoid_cut.gradle")
 apply from: rootProject.file("x_build/mod_info.gradle")
 apply from: rootProject.file("x_build/launchers.gradle")
 apply from: rootProject.file("x_build/depend/github_depend.gradle")
@@ -72,11 +73,14 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     if (project.properties.minecraft != nativeAvoidMinecraft()) {
-        modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}+${project.properties.minecraft}"
-        compileOnly       "pl.olafcio:avoid:${project.properties.avoid_version}"
+        modRuntimeOnly "pl.olafcio:avoid:${project.properties.avoid_version}+${project.properties.minecraft}"
     } else {
-        modImplementation "pl.olafcio:avoid:${project.properties.avoid_version}"
+        modRuntimeOnly "pl.olafcio:avoid:${project.properties.avoid_version}"
     }
+
+    // This is done because Avoid has a lot of internals (the 2 recent releases were absolute refactors of those!).
+    // They would confuse you that they're public, or simply clutter your tabcompletions.
+    modCompileOnly "pl.olafcio:avoid:${project.properties.avoid_version}+cut"
 
     if ('backported' in readFMJ(avoidRuntime)['depends']) {
         modRuntimeOnly github("AvoidLib/Backported", jarFinder: { fn -> fn.contains("+" + project.properties.minecraft) })
