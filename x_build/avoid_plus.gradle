@@ -9,14 +9,14 @@ class AvoidPlus {
 }
 
 project.extensions.create("avoid", AvoidPlus)
-project.tasks.remapJar.doLast {
+effectiveJar.doLast {
     var ext = project.extensions.getByType(AvoidPlus)
     if (ext.signatures) {
         var bos = new ByteArrayOutputStream()
         var zos = new ZipOutputStream(bos)
 
         var signatures = new StringBuilder()
-        var file = (File) project.remapJar.archiveFile.get().asFile
+        var file = (File) effectiveJar.archiveFile.get().asFile
 
         try (var zip = new ZipFile(file)) {
             var entries = zip.entries()
