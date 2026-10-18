@@ -22,7 +22,7 @@ def shear(Path source, Path destination) {
         while (entries.hasMoreElements()) {
             var entry = entries.nextElement()
 
-            if (!entry.getName().startsWithAny("pl/olafcio/avoid_impl", "pl/olafcio/avoid_platform")) {
+            if (entry.getName() !in ["fabric.mod.json"] && !entry.getName().endsWith(".accesswidener") && !entry.getName().startsWithAny("pl/olafcio/avoid_impl", "pl/olafcio/avoid_platform")) {
                 zos.putNextEntry(entry)
 
                 try (var stream = zip.getInputStream(entry)) {
