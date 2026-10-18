@@ -36,7 +36,7 @@ void downloadAvoidRuntime_fun() {
     def index = versions.indexOf(version['id'])
 
     while (true) {
-        if (properties.minecraft !in version['game_versions']) {
+        if (properties.minecraft !in version['game_versions'] || 'fabric' !in version['loaders']) {
             var ver = versions[index += adding]
             if (ver == null)
                 break
